@@ -33,7 +33,7 @@ public class Robot extends TimedRobot {
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
   //added
-  private final DifferentialDrive m_robot
+ 
 
   //below are constants.  Benifit: the constant may show up in more than one place, you only have to change one.
   //                               your code has words and not just numbers
@@ -41,11 +41,17 @@ public class Robot extends TimedRobot {
   private static final int leftbackID = 2;
   private static final int rightfrontID = 3;
   private static final int rightbackID = 4;
+  private static final int feedID = 5;
 
+  //motor controlers
   private final CANSparkMax m_leftfront = new CANSparkMax(leftfrontID);
   private final CANSparkMax m_leftback = new CANSparkMax(leftbackID);
   private final CANSparkMax m_righfront = new CANSparkMax(rightfrontID);
   private final CANSparkMax m_rightback = new CANSparkMax(rightbackID);
+  private final CANSparkMax m_feed = new CANSparkMax(feedID);
+
+  private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftfront, m_rightfront);
+
 
 
   /**
