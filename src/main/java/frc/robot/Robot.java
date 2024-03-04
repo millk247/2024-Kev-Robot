@@ -16,6 +16,10 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;  //used for follow() method
 import com.ctre.phoenix.motorcontrol.ControlMode;  //black VEX pro motor controler
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;  //black VEX pro motor controler
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.Joystick;
+
 
 
 
@@ -37,20 +41,30 @@ public class Robot extends TimedRobot {
 
   //below are constants.  Benifit: the constant may show up in more than one place, you only have to change one.
   //                               your code has words and not just numbers
-  private static final int leftfrontID = 1;
-  private static final int leftbackID = 2;
-  private static final int rightfrontID = 3;
-  private static final int rightbackID = 4;
+  private static final int leftfrontID = 2;
+  private static final int leftbackID = 1;
+  private static final int rightfrontID = 11;
+  private static final int rightbackID = 12;
   private static final int feedID = 5;
+  private static final int lauchTopID = 6;
+  private static final int launchBottomID = 7;
+  private static final int rotateLeftID = 8;
+  private static final int rotateRightID = 9;
 
   //motor controlers
-  private final CANSparkMax m_leftfront = new CANSparkMax(leftfrontID);
-  private final CANSparkMax m_leftback = new CANSparkMax(leftbackID);
-  private final CANSparkMax m_righfront = new CANSparkMax(rightfrontID);
-  private final CANSparkMax m_rightback = new CANSparkMax(rightbackID);
+  private final WPI_VictorSPX m_leftfront = new CANSparkMax(leftfrontID);
+  private final WPI_VictorSPX m_leftback = new CANSparkMax(leftbackID);
+  private final WPI_VictorSPX m_righfront = new CANSparkMax(rightfrontID);
+  private final WPI_VictorSPX m_rightback = new CANSparkMax(rightbackID);
   private final CANSparkMax m_feed = new CANSparkMax(feedID);
+  private final CANSparkMax m_launchTop = new CANSparkMax(lauchTopID);
+  private final CANSparkMax m_launchBottom = new CANSparkMax(launchBottomID);
+  private final CANSparkMax m_rotateLeft = new CANSparkMax(rotateLeftID);
+  private final CANSparkMax m_rotateRight = new CANSparkMax(rotateRightID);
 
   private final DifferentialDrive m_robotDrive = new DifferentialDrive(m_leftfront, m_rightfront);
+  private final Joystick driver = new Joystick(0);
+  private final XboxController operator = new XboxController(1);
 
 
 
@@ -70,6 +84,9 @@ public class Robot extends TimedRobot {
     //CAN follow method
     m_leftback.follow(m_leftfront);
     m_rightback.follow(m_rightfront);
+    m_launchBottom.follow(m_launchTop);
+    m_rotateRight.follow(m_rotateLeft);
+
   }
 
   /**
@@ -116,11 +133,47 @@ public class Robot extends TimedRobot {
 
   /** This function is called once when teleop is enabled. */
   @Override
-  public void teleopInit() {}
+  public void teleopInit() {
+
+
+  }
 
   /** This function is called periodically during operator control. */
   @Override
-  public void teleopPeriodic() {}
+  public void teleopPeriodic() {
+    
+    m_robotDrive.arcadeDrive(-driver.getY(), -driver.getX());
+//Rotate arm
+    double rotateSpeed = operator.getRawAxis(3); //Get the manual lift speed
+    if(rotateSpeed > 0) { //If the manual speed is negative..._??negative??
+      rotateSpeed *= 0.5; //Limit the rotate forward speed
+       m_rotateLeft.set(rotateForwardSpeed);
+    }  else {  //Else...
+      rotateSpeed *= 0; //Limit the down speed_?? it was 0.1??_Oh...joystick down(-) 
+      m_rotateLeft.set(rotateForwardSpeed);
+    }
+
+  if(rotateSpeed < 0) { //If the manual speed is negative..._??negative??
+    rotateForwardSpeed *= -0.1; //Limit the rotate forward speed
+     m_rotateLeft.set(rotateForwardSpeed);
+    }  else {  //Else...
+    rotateSpeed *= 0; //Limit the down speed_?? it was 0.1??_Oh...joystick down(-) 
+    m_rotateLeft.set(rotateSpeed);
+    }
+
+
+//intake
+    double launchSpeed = operator.getRawAxis(1);
+    m_launchTop.set(launchSpeed)
+  
+
+  public void SerialCommandGroup { //sequential and parallel command groups
+      command 1.wait(0.5),
+      Command 2
+  
+  m_feed.set(0.2)
+  }
+  }
 
   /** This function is called once when the robot is disabled. */
   @Override
